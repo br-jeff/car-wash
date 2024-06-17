@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql
+    container_name: mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_DATABASE: dev
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+    volumes:
+      - dbdata:/var/lib/mysq
+    networks:
+      - backend
+
+  api:
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    command: sh -c "npm install && npm run start"
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      PORT: 3000
+      DATABASE_URL: "mysql://dev:dev@localhost:3306/dev?allowPublicKeyRetrieval=true"
+    networks:
+      - backend
+
+volumes:
+  dbdata:
+
+
+networks:
+  backend:
