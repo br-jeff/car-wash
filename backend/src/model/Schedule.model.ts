@@ -1,6 +1,6 @@
-export type SchduleModelType = {
-    licensePlate: string;
-    washType: 'SIMPLE' | 'FULL';
-    startDate: Date | string
-    endDate: Date | string
+export type ScheduleModelType = {
+  licensePlate: string;
+  washingType: 'SIMPLE' | 'FULL';
+  startDate: Date | string;
+  endDate: Date | string;
 };

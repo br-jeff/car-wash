@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { Schedule } from '@prisma/client';
 import { Pagination } from 'src/types/pagination';
-import { SchduleModelType } from 'src/model/Schedule.model';
+import { ScheduleModelType } from 'src/model/Schedule.model';
 
 type DateRange = {
-  startDate: Date
-  endDate: Date
-}
+  startDate: Date;
+  endDate: Date;
+};
 
 @Injectable()
 export class ScheduleRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async getById(id: number): Promise<Schedule | null> {
     return this.prisma.schedule.findUnique({
@@ -27,11 +27,11 @@ export class ScheduleRepository {
     });
   }
 
-  async create(data: SchduleModelType) {
-    const { licensePlate, washType, startDate, endDate } = data;
+  async create(data: ScheduleModelType) {
+    const { licensePlate, washingType, startDate, endDate } = data;
     return this.prisma.schedule.create({
       data: {
-        washType,
+        washingType,
         licensePlate,
         startDate,
         endDate,
@@ -44,7 +44,6 @@ export class ScheduleRepository {
       where: { id },
     });
   }
-
 
   async checkOverlapDate({ startDate, endDate }: DateRange): Promise<boolean> {
     const overlappingSchedules = await this.prisma.schedule.findMany({
@@ -74,7 +73,6 @@ export class ScheduleRepository {
 
     return overlappingSchedules.length > 0;
   }
-
 
   async get(id: number): Promise<Schedule | null> {
     return this.prisma.schedule.findUnique({

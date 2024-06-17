@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, Matches, IsIn } from 'class-validator';
-import WashTypeEnum from 'src/enums/washType.enum';
+import washingTypeEnum from 'src/enums/washType.enum';
 
 export class CreateScheduleValidator {
   @IsNotEmpty()
@@ -9,11 +9,10 @@ export class CreateScheduleValidator {
 
   @IsNotEmpty()
   @IsString()
-  @IsIn(Object.values(WashTypeEnum))
-  washType: 'SIMPLE' | 'FULL';
+  @IsIn(Object.values(washingTypeEnum))
+  washingType: 'SIMPLE' | 'FULL';
 
   @IsNotEmpty()
   @IsString()
   startDate: Date;
 }
-
