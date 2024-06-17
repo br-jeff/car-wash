@@ -1,16 +1,18 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsNumber, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, Min } from 'class-validator';
 
 export class PaginationValidator {
   @Expose()
-  @Transform(({ value }) => value ?? 1)
-  @IsNumber()
+  @Transform(({ value }) => parseInt(value) ?? 1)
+  @IsInt()
   @Min(1)
+  @IsNumber()
   page: number;
 
   @Expose()
-  @Transform(({ value }) => value ?? 10)
+  @Transform(({ value }) => parseInt(value) ?? 10)
   @Min(1)
   @IsNumber()
+  @IsNotEmpty()
   size: number;
 }

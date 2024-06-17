@@ -90,3 +90,7 @@ export class CreateScheduleUseCase {
     }
   }
 }
+function UseFilters(arg0: any): (target: typeof CreateScheduleUseCase) => void | typeof CreateScheduleUseCase {
+  throw new Error('Function not implemented.');
+}
+

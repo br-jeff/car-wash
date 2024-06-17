@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,6 +7,8 @@ import {
   Post,
   Query,
   UseFilters,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { ScheduleRepository } from 'src/repository/Schedule.repository';
@@ -28,14 +31,21 @@ export class ScheduleController {
 
     return this.scheduleRepository.listAll({
       pagination: {
-        skip: (Number(page) - 1) * Number(size),
-        take: Number(size),
+        skip: (page - 1) * size,
+        take: size,
       },
       filters: null,
     });
   }
 
   @Post()
+  @UsePipes(
+    new ValidationPipe({
+      forbidNonWhitelisted: true,
+      whitelist: true,
+      transform: true,
+    }),
+  )
   @UseFilters(new HttpExceptionFilter())
   async create(@Body() data: CreateScheduleValidator) {
     return this.createScheduleUseCase.execute(data);
