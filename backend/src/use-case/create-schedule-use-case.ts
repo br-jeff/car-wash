@@ -10,10 +10,8 @@ export class CreateScheduleUseCase {
   constructor(private scheduleRepository: ScheduleRepository) {}
 
   async execute(data: Omit<ScheduleModelType, 'endDate'>) {
-    console.info({ data });
-    const endDate = moment(data.startDate);
-    const startDate = moment(data.startDate);
-    // this.validateInterval(startDate, endDate);
+    const endDate = moment(data.startDate).add({ hour: -3 });
+    const startDate = moment(data.startDate).add({ hour: -3 });
 
     if (data.washingType === washingTypeEnum.FULL) {
       endDate.add({ minutes: 45 });
@@ -21,6 +19,7 @@ export class CreateScheduleUseCase {
       endDate.add({ minutes: 30 });
     }
 
+    this.validateInterval(startDate, endDate);
     const hasOverlap = await this.scheduleRepository.checkOverlapDate({
       startDate: startDate.toDate(),
       endDate: endDate.toDate(),
@@ -37,35 +36,38 @@ export class CreateScheduleUseCase {
   }
 
   private validateInterval(startDate: moment.Moment, endDate: moment.Moment) {
+    if (!startDate.isAfter(moment())) {
+      throw new BadRequestException('Agendamento no passado não é possivel');
+    }
     const DAYS_OF_WEEK = {
-      MONDAY: 1,
-      TUESDAY: 2,
-      WEDNESDAY: 3,
-      THURSDAY: 4,
-      FRIDAY: 5,
-      SATURDAY: 6,
-      SUNDAY: 0,
+      MONDAY: 3,
+      TUESDAY: 4,
+      WEDNESDAY: 5,
+      THURSDAY: 6,
+      FRIDAY: 0,
+      SATURDAY: 1,
+      SUNDAY: 2,
     };
 
     const BUSINESS_HOURS_CONSTANTS = {
-      START_MORNING: 10,
-      END_MORNING: 12,
-      START_AFTERNOON: 13,
-      END_AFTERNOON: 18,
-      END_WORKDAY: 18,
+      START_WORKING: 10,
+      START_LUNCH: 12,
+      END_LUNCH: 13,
+      END_WORKING: 18,
     };
 
-    const startDayOfWeek = startDate.day();
-    const startHourOfDay = startDate.hour();
-    const endHourOfDay = endDate.hour();
+    const scheduleDay = startDate.weekday();
+    const startHourOfSchedule = startDate.hour();
+    const endHourOfSchedule = endDate.hour();
 
-    // Verificar se o dia não é um dia da semana
+    console.log({ startDate, endDate, startHourOfSchedule });
+    console.log({ scheduleDay, startHourOfSchedule, endHourOfSchedule });
     if (
-      startDayOfWeek !== DAYS_OF_WEEK.MONDAY &&
-      startDayOfWeek !== DAYS_OF_WEEK.TUESDAY &&
-      startDayOfWeek !== DAYS_OF_WEEK.WEDNESDAY &&
-      startDayOfWeek !== DAYS_OF_WEEK.THURSDAY &&
-      startDayOfWeek !== DAYS_OF_WEEK.FRIDAY
+      scheduleDay !== DAYS_OF_WEEK.MONDAY &&
+      scheduleDay !== DAYS_OF_WEEK.TUESDAY &&
+      scheduleDay !== DAYS_OF_WEEK.WEDNESDAY &&
+      scheduleDay !== DAYS_OF_WEEK.THURSDAY &&
+      scheduleDay !== DAYS_OF_WEEK.FRIDAY
     ) {
       throw new BadRequestException(
         'O agendamento deve ser feito de segunda a sexta-feira',
@@ -73,24 +75,22 @@ export class CreateScheduleUseCase {
     }
 
     if (
-      startHourOfDay < BUSINESS_HOURS_CONSTANTS.START_MORNING ||
-      startHourOfDay >= BUSINESS_HOURS_CONSTANTS.END_AFTERNOON ||
-      (startHourOfDay >= BUSINESS_HOURS_CONSTANTS.END_MORNING &&
-        startHourOfDay < BUSINESS_HOURS_CONSTANTS.START_AFTERNOON)
+      startHourOfSchedule < BUSINESS_HOURS_CONSTANTS.START_WORKING ||
+      startHourOfSchedule >= BUSINESS_HOURS_CONSTANTS.END_WORKING ||
+      (startHourOfSchedule >= BUSINESS_HOURS_CONSTANTS.START_LUNCH &&
+        startHourOfSchedule < BUSINESS_HOURS_CONSTANTS.END_LUNCH) ||
+      (endHourOfSchedule >= BUSINESS_HOURS_CONSTANTS.START_LUNCH &&
+        endHourOfSchedule < BUSINESS_HOURS_CONSTANTS.END_LUNCH)
     ) {
       throw new BadRequestException(
-        'O agendamento deve ser dentro do horário comercial (das 10h às 12h e das 13h às 18h)',
+        'O Inicio e o fim do agendamento deve ser dentro do horário comercial',
       );
     }
 
-    if (endHourOfDay > BUSINESS_HOURS_CONSTANTS.END_WORKDAY) {
+    if (endHourOfSchedule > BUSINESS_HOURS_CONSTANTS.END_WORKING) {
       throw new BadRequestException(
         'O agendamento não pode ultrapassar às 18h',
       );
     }
   }
 }
-function UseFilters(arg0: any): (target: typeof CreateScheduleUseCase) => void | typeof CreateScheduleUseCase {
-  throw new Error('Function not implemented.');
-}
-

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -13,6 +12,7 @@ import {
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { ScheduleRepository } from 'src/repository/Schedule.repository';
 import { CreateScheduleUseCase } from 'src/use-case/create-schedule-use-case';
+import { ListAvalibleScheduleUseCase } from 'src/use-case/list-avalible-schedule-use-case';
 import { CreateScheduleValidator } from 'src/validators/createSchedule';
 import { PaginationValidator } from 'src/validators/pagination';
 
@@ -22,6 +22,7 @@ export class ScheduleController {
   constructor(
     private scheduleRepository: ScheduleRepository,
     private createScheduleUseCase: CreateScheduleUseCase,
+    private listAvalibleScheduleUseCas: ListAvalibleScheduleUseCase,
   ) {}
 
   @Get()
@@ -36,6 +37,11 @@ export class ScheduleController {
       },
       filters: null,
     });
+  }
+
+  @Get('avalible-date')
+  async findByDate(@Query() queryParams: PaginationValidator) {
+    return this.listAvalibleScheduleUseCas.execute(data);
   }
 
   @Post()

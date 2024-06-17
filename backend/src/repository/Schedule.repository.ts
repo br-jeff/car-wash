@@ -3,6 +3,7 @@ import { PrismaService } from '../services/prisma.service';
 import { Schedule } from '@prisma/client';
 import { Pagination } from 'src/types/pagination';
 import { ScheduleModelType } from 'src/model/Schedule.model';
+import moment from 'moment';
 
 type DateRange = {
   startDate: Date;
@@ -24,6 +25,19 @@ export class ScheduleRepository {
     return this.prisma.schedule.findMany({
       skip,
       take,
+    });
+  }
+
+  async listByDay(date: moment.Moment) {
+    const startOfDay = date.startOf('day').toString();
+    const endOfDay = date.endOf('day').toString();
+    return this.prisma.schedule.findMany({
+      where: {
+        startDate: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
     });
   }
 
