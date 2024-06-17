@@ -1,7 +1,7 @@
 import { Field, Form, Formik } from 'formik';
 import moment from 'moment';
 import * as Yup from 'yup';
-import WashTypeEnum from '../enums/washType.enum';
+import ScheduleService from '../services/api';
 
 const REQUIRED_TEXT = (field: string) => `O campo ${field} é obrigatório`
 
@@ -31,8 +31,8 @@ const ScheduleSchema = Yup.object().shape({
         //  .matches(/[A-Z]{3}[0-9][0-9A-Z][0-9]{2}/, { message: 'A placa não é mercosul' })
         .required(REQUIRED_TEXT('Placa')),
     day: Yup.string().required(),
-    washType: Yup.string().required(REQUIRED_TEXT('Tipo de lavagem')),
-        // .oneOf(Object.values(WashTypeEnum), 'Tipo de lavagem não existe'),
+    washingType: Yup.string().required(REQUIRED_TEXT('Tipo de lavagem')),
+    // .oneOf(Object.values(washingTypeEnum), 'Tipo de lavagem não existe'),
     hour: Yup.string()
     //.required(REQUIRED_TEXT('Hora'))
     // .test((value, ctx) => checkTime(value, ctx)),
@@ -43,50 +43,62 @@ export default function Home() {
         <div>
             <h1>Anywhere in your app!</h1>
             <Formik
-                initialValues={{ licensePlate: '', day: moment().format('DD/MM/YYYY'), hour: '', washType: moment().format('hh:mm') }}
+                initialValues={{
+                    licensePlate: '',
+                    day: moment().format('DD/MM/YYYY'),
+                    hour: moment().format('HH:mm'),
+                    washingType: 'SIMPLE',
+                }}
                 validationSchema={ScheduleSchema}
-                onSubmit={values => {
-                    const {licensePlate,washType } = values
-                    const [day, month, year] = values.day.split('/')
-                    const [hour, minute] = values.hour.split(':')
-                    const schedule = {
-                        licensePlate,
-                        washType,
-                        date: moment({
-                            day: Number(day),
-                            month: Number(month),
-                            year: Number(year),
-                            hour: Number(hour),
-                            minutes: Number(minute)
-                        })
+                onSubmit={async (values, { setSubmitting }) => {
+                    try {
+                        const { licensePlate} = values
+                        const washingType = values.washingType as 'SIMPLE' | 'FULL'
+                        const [day, month, year] = values.day.split('/')
+                        const [hour, minute] = values.hour.split(':')
+                        const schedule = {
+                            licensePlate,
+                            washingType,
+                            startDate: moment({
+                                day: Number(day),
+                                month: Number(month),
+                                year: Number(year),
+                                hour: Number(hour),
+                                minutes: Number(minute)
+                            }).toISOString()
+                        }
+
+                        const newSchedule = await ScheduleService.createSchedule(schedule);
+                        console.log('Agendamento criado:', {newSchedule});
+                    } catch (error) {
+                        console.error('Erro ao criar o agendamento');
+                        console.log(error)
+                    } finally {
+                        setSubmitting(false);
                     }
-                    console.log({schedule})
-                }}>
+                }}
+            >
                 {({ errors, touched }) => (
                     <Form>
                         <label htmlFor="licensePlate">Placa do Veículo</label>
                         <Field id="licensePlate" name="licensePlate" />
-                        {errors.licensePlate && touched.licensePlate ? (
-                            <div>{errors.licensePlate}</div>
-                        ) : null}
+                        {errors.licensePlate && touched.licensePlate ? <div>{errors.licensePlate}</div> : null}
 
                         <label htmlFor="day">Dia</label>
                         <Field id="day" name="day" />
-                        {errors.day && touched.day ? (
-                            <div>{errors.day}</div>
-                        ) : null}
+                        {errors.day && touched.day ? <div>{errors.day}</div> : null}
 
-                        <label htmlFor="washType">Tipo de lavagem</label>
-                        <Field as="select" id="washType" name="washType">
-                            <option value="simple">Simples</option>
-                            <option value="full">Completo</option>
+                        <label htmlFor="washingType">Tipo de lavagem</label>
+                        <Field as="select" id="washingType" name="washingType">
+                            <option value="SIMPLE">Simples</option>
+                            <option value="FULL">Completo</option>
                         </Field>
-                        {errors.washType && touched.washType ? <div>{errors.washType}</div> : null}
+                        {errors.washingType && touched.washingType ? <div>{errors.washingType}</div> : null}
 
                         <label htmlFor="hour">Hora</label>
-
                         <Field id="hour" name="hour" />
                         {errors.hour && touched.hour ? <div>{errors.hour}</div> : null}
+
                         <button type="submit">Adicionar</button>
                     </Form>
                 )}
