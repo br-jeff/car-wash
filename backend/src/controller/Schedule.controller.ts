@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Injectable, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Injectable,
+  Post,
+  Query,
+  UseFilters,
+} from '@nestjs/common';
+import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { ScheduleRepository } from 'src/repository/Schedule.repository';
 import { CreateScheduleUseCase } from 'src/use-case/create-schedule-use-case';
 import { CreateScheduleValidator } from 'src/validators/createSchedule';
@@ -25,8 +34,10 @@ export class ScheduleController {
       filters: null,
     });
   }
+
   @Post()
+  @UseFilters(new HttpExceptionFilter())
   async create(@Body() data: CreateScheduleValidator) {
-    this.createScheduleUseCase.execute(data);
+    return this.createScheduleUseCase.execute(data);
   }
 }

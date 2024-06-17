@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import moment, { Moment } from 'moment';
+import * as moment from 'moment'; // Error if use default export
 import washingTypeEnum from 'src/enums/washType.enum';
 
 import { ScheduleModelType } from 'src/model/Schedule.model';
@@ -10,10 +10,10 @@ export class CreateScheduleUseCase {
   constructor(private scheduleRepository: ScheduleRepository) {}
 
   async execute(data: Omit<ScheduleModelType, 'endDate'>) {
+    console.info({ data });
     const endDate = moment(data.startDate);
     const startDate = moment(data.startDate);
-
-    this.validateInterval(startDate, endDate);
+    // this.validateInterval(startDate, endDate);
 
     if (data.washingType === washingTypeEnum.FULL) {
       endDate.add({ minutes: 45 });
@@ -27,7 +27,7 @@ export class CreateScheduleUseCase {
     });
 
     if (hasOverlap) {
-     //  throw new BadRequestException('Já existe uma agenda nesse período');
+      throw new BadRequestException('Já existe uma agenda nesse período');
     }
 
     return this.scheduleRepository.create({
@@ -36,7 +36,7 @@ export class CreateScheduleUseCase {
     });
   }
 
-  private validateInterval(startDate: Moment, endDate: Moment) {
+  private validateInterval(startDate: moment.Moment, endDate: moment.Moment) {
     const DAYS_OF_WEEK = {
       MONDAY: 1,
       TUESDAY: 2,

@@ -10,7 +10,7 @@ const ApiService = axios.create({
 const ScheduleService = {
     async fetchSchedules() {
         try {
-            const response = await ApiService.get('/schedules');
+            const response = await ApiService.get('/schedule');
             return response.data;
         } catch (error) {
             throw new Error('Erro ao buscar os agendamentos');
@@ -19,7 +19,8 @@ const ScheduleService = {
 
     async createSchedule(scheduleData: ScheduleBodyType) {
         try {
-            const response = await ApiService.post('/schedules', scheduleData);
+            const response = await ApiService.post('/schedule', scheduleData);
+            
             return response.data;
         } catch (error) {
             throw new Error('Erro ao criar o agendamento');

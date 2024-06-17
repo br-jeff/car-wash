@@ -68,6 +68,7 @@ export default function Home() {
                             }).toISOString()
                         }
 
+                        console.log({schedule})
                         const newSchedule = await ScheduleService.createSchedule(schedule);
                         console.log('Agendamento criado:', {newSchedule});
                     } catch (error) {
