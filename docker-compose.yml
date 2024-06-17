@@ -12,15 +12,15 @@ services:
       MYSQL_USER: dev
       MYSQL_PASSWORD: dev
     volumes:
-      - dbdata:/var/lib/mysq
+      - dbdata:/var/lib/mysql
     networks:
-      - backend
+      - backend    
 
   api:
     working_dir: /app
     volumes:
       - ./backend:/app
-    command: sh -c "npm install && npm run start"
+    command: sh -c "npm install && npm run start:dev && npm run migrate:init"
     build: .
     ports:
       - "3000:3000"
@@ -28,7 +28,7 @@ services:
       - db
     environment:
       PORT: 3000
-      DATABASE_URL: "mysql://dev:dev@localhost:3306/dev?allowPublicKeyRetrieval=true"
+      DATABASE_URL: "mysql://root:dev@db:3306/dev?allowPublicKeyRetrieval=true"
     networks:
       - backend
 
@@ -36,7 +36,7 @@ services:
     working_dir: /app
     volumes:
       - ./frontend:/app
-    command: sh -c "npm install && npm run start"
+    command: sh -c "npm install && REACT_APP_BACKEND_URL=http://localhost:3000 npm run start" 
     build: .
     ports:
       - "3001:3001"
