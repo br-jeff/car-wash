@@ -1,6 +1,6 @@
-const WashTypeEnum = Object.freeze({
+const washingTypeEnum = Object.freeze({
   SIMPLE: 'SIMPLE',
   FULL: 'FULL'
 })
 
-export default WashTypeEnum
+export default washingTypeEnum
