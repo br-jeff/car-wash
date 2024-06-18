@@ -40,13 +40,13 @@ export class CreateScheduleUseCase {
       throw new BadRequestException('Agendamento no passado não é possivel');
     }
     const DAYS_OF_WEEK = {
-      MONDAY: 3,
-      TUESDAY: 4,
-      WEDNESDAY: 5,
-      THURSDAY: 6,
-      FRIDAY: 0,
-      SATURDAY: 1,
-      SUNDAY: 2,
+      SUNDAY: 0,
+      MONDAY: 1,
+      TUESDAY: 2,
+      WEDNESDAY: 3,
+      THURSDAY: 4,
+      FRIDAY: 5,
+      SATURDAY: 6,
     };
 
     const BUSINESS_HOURS_CONSTANTS = {

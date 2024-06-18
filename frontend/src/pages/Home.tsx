@@ -17,7 +17,7 @@ import {
 import 'react-toastify/dist/ReactToastify.css';
 import Menu from '../components/Menu';
 
-const REQUIRED_TEXT = (field: string) => `O campo ${field} é obrigatório`
+const REQUIRED_TEXT = (field: string) => `O campo ${field} é obrigatório`;
 
 function checkTime(value: string, ctx: Yup.TestContext<Yup.AnyObject>) {
   const { createError } = ctx;
@@ -26,52 +26,52 @@ function checkTime(value: string, ctx: Yup.TestContext<Yup.AnyObject>) {
     return createError({ message: 'Formato do Horário inválido' });
   }
 
-  const [hour, minute] = value.split(':')
-  const todayHour = moment().set({ hour: Number(hour), minute: Number(minute) })
+  const [hour, minute] = value.split(':');
+  const todayHour = moment().set({ hour: Number(hour), minute: Number(minute) });
   if (!todayHour.isValid()) {
     return createError({ message: 'Horário não existe' });
   }
 
-  if (todayHour.isAfter(moment().set({ hour: 18 })) || todayHour.isBefore(moment().set({ hour: 10 }))) {
+   if (todayHour.isAfter(moment().set({ hour: 18, minutes: 0 })) || todayHour.isBefore(moment().set({ hour: 10, minutes: 0  }))) {
     return createError({ message: 'Horário de funcionamento é das 10:00h as 18:00h' });
   }
 
-  return true
+  return true;
 };
 
 function checkDay(value: string, ctx: Yup.TestContext<Yup.AnyObject>) {
   const { createError } = ctx;
-  const [day, month, year] = value.split('/')
+  const [day, month, year] = value.split('/');
 
-  console.log({ day, month, year })
   if (!day || !month || !year) {
     return createError({ message: 'Data errada' });
   }
   const date = moment({
     day: Number(day),
-    month: Number(month),
+    month: Number(month) -1,
     year: Number(year)
-  })
+  });
 
+  console.log({date, momentS: date.toDate()})
   if (!date.isValid()) {
     return createError({ message: 'Data Invalida' });
   }
 
   const DAYS_OF_WEEK = {
-    MONDAY: 3,
-    TUESDAY: 4,
-    WEDNESDAY: 5,
-    THURSDAY: 6,
-    FRIDAY: 0,
-    SATURDAY: 1,
-    SUNDAY: 2,
+    SUNDAY: 0,
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
   };
-
+  
   if (date.weekday() === DAYS_OF_WEEK.SATURDAY || date.weekday() === DAYS_OF_WEEK.SUNDAY) {
     return createError({ message: 'Funcionamento de segunda a sexta-feira' });
   }
 
-  return true
+  return true;
 };
 
 const ScheduleSchema = Yup.object().shape({
@@ -92,49 +92,47 @@ export default function Home() {
       <Menu />
       <Formik
         initialValues={{
-          licensePlate: 
-          '',
+          licensePlate: '',
           day: '',
           hour: '',
           washingType: 'SIMPLE',
         }}
         validationSchema={ScheduleSchema}
         onSubmit={async (values, { setSubmitting }) => {
-          
           try {
-            const { licensePlate } = values
-            const washingType = values.washingType as 'SIMPLE' | 'FULL'
-            const [day, month, year] = values.day.split('/')
-            const [hour, minute] = values.hour.split(':')
+            const { licensePlate } = values;
+            const washingType = values.washingType as 'SIMPLE' | 'FULL';
+            const [day, month, year] = values.day.split('/');
+            const [hour, minute] = values.hour.split(':');
             const schedule = {
               licensePlate,
               washingType,
               startDate: moment({
                 day: Number(day),
-                month: Number(month),
+                month: Number(month) -1,
                 year: Number(year),
                 hour: Number(hour),
                 minutes: Number(minute)
               }).toDate()
-            }
+            };
 
             const newSchedule = await ScheduleService.createSchedule(schedule);
 
             if (newSchedule.isError) {
               toast.error(newSchedule.message);
+            } else {
+              toast.success('Sucesso');
             }
-
-            toast.success('Sucesso');
 
           } catch (error) {
             toast.error('Error');
-            console.log(error)
+            console.log(error);
           } finally {
             setSubmitting(false);
           }
         }}
       >
-        {({ errors, touched, values }) => (
+        {({ errors, touched, values, isValid, isSubmitting }) => (
           <>
             <ToastContainer />
             <FormContainer>
@@ -156,10 +154,9 @@ export default function Home() {
 
                 <StyledLabel htmlFor="hour">Hora</StyledLabel>
                 <StyledInput disabled={!values.day || !values.licensePlate || errors.day || errors.licensePlate} id="hour" name="hour" />
-
                 {errors.hour && touched.hour ? <ErrorDiv>{errors.hour}</ErrorDiv> : null}
 
-                <StyledButton type="submit">Adicionar</StyledButton>
+                <StyledButton type="submit" disabled={!isValid || isSubmitting}>Adicionar</StyledButton>
               </StyledForm>
             </FormContainer>
           </>

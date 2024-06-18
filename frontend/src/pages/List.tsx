@@ -73,8 +73,6 @@ const ScheduleTable: React.FC<ScheduleTableProps> = () => {
                             <TableHeaderCell>Tipo de Lavagem</TableHeaderCell>
                             <TableHeaderCell>Data de Início</TableHeaderCell>
                             <TableHeaderCell>Data de Término</TableHeaderCell>
-                            <TableHeaderCell>Criado em</TableHeaderCell>
-                            <TableHeaderCell>Atualizado em</TableHeaderCell>
                             <TableHeaderCell>Deletar</TableHeaderCell>
                         </TableRow>
                     </TableHeader>
@@ -86,8 +84,6 @@ const ScheduleTable: React.FC<ScheduleTableProps> = () => {
                                 <TableCell>{schedule.washingType}</TableCell>
                                 <TableCell>{new Date(schedule.startDate).toLocaleString()}</TableCell>
                                 <TableCell>{new Date(schedule.endDate).toLocaleString()}</TableCell>
-                                <TableCell>{new Date(schedule.createdAt).toLocaleString()}</TableCell>
-                                <TableCell>{new Date(schedule.updatedAt).toLocaleString()}</TableCell>
                                 <TableCell onClick={() => deleteSchedule(schedule.id)}>&nbsp;&nbsp;&nbsp;&nbsp; X </TableCell>
                             </TableRow>
                         ))}
