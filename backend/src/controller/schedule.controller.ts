@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Injectable,
+  Param,
   Post,
   Query,
   UseFilters,
@@ -39,9 +41,9 @@ export class ScheduleController {
     });
   }
 
-  @Get('avalible-date')
-  async findByDate(@Query() queryParams: PaginationValidator) {
-    return this.listAvalibleScheduleUseCas.execute(data);
+  @Get('avalible-date/:date')
+  async findByDate(@Param('date') date: string) {
+    return this.listAvalibleScheduleUseCas.execute(date);
   }
 
   @Post()
@@ -55,5 +57,10 @@ export class ScheduleController {
   @UseFilters(new HttpExceptionFilter())
   async create(@Body() data: CreateScheduleValidator) {
     return this.createScheduleUseCase.execute(data);
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id') id: string) {
+    this.scheduleRepository.deleteById(Number(id));
   }
 }

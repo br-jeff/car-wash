@@ -29,8 +29,14 @@ export class ScheduleRepository {
   }
 
   async listByDay(date: moment.Moment) {
-    const startOfDay = date.startOf('day').toString();
-    const endOfDay = date.endOf('day').toString();
+    console.log({ date });
+    const startOfDay = date.startOf('day').toDate();
+    const endOfDay = date.endOf('day').toDate();
+    console.log({ startOfDay, endOfDay });
+
+    /*  return this.prisma
+      .$queryRaw`select * from Schedule s where startDate > '${startOfDay}' and startDate < '${endOfDay}'`;
+ */
     return this.prisma.schedule.findMany({
       where: {
         startDate: {

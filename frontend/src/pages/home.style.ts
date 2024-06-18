@@ -15,7 +15,6 @@ export const FormContainer = styled.div`
 export const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
-  width: 100%;
 `;
 
 export const StyledLabel = styled.label`
@@ -28,6 +27,7 @@ export const StyledInput = styled(Field)`
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  width: 250px;
 `;
 
 export const StyledSelect = styled(Field)`
@@ -35,6 +35,7 @@ export const StyledSelect = styled(Field)`
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  width: 275px;
 `;
 
 export const StyledButton = styled.button`
@@ -47,7 +48,7 @@ export const StyledButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #8870FF;
   }
 `;
 
@@ -56,6 +57,7 @@ export const ErrorDiv = styled.div`
   font-size: 14px;
   margin-top: 2px;
   margin-bottom: 8px;
+  
 `;
 
 export const TitlleApp = styled.h1`

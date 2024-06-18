@@ -1,10 +1,13 @@
+import { Injectable } from '@nestjs/common';
+import * as moment from 'moment';
 import { ScheduleRepository } from 'src/repository/Schedule.repository';
 
+@Injectable()
 export class ListAvalibleScheduleUseCase {
   constructor(private scheduleRepository: ScheduleRepository) {}
 
-  async execute() {
-    const possibleHour = [
+  async execute(date: string) {
+    /*   const possibleHour = [
       '10:00',
       '10:15',
       '10:30',
@@ -33,7 +36,11 @@ export class ListAvalibleScheduleUseCase {
       '17:15',
       '17:30',
       '17:45',
-    ];
-    this.scheduleRepository.listByDay()
+    ]; */
+
+    const momentDate = moment(date);
+
+    const schedules = await this.scheduleRepository.listByDay(momentDate);
+    console.log({ schedules });
   }
 }
