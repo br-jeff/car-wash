@@ -92,9 +92,10 @@ export default function Home() {
       <Menu />
       <Formik
         initialValues={{
-          licensePlate: 'DIV3I14',
-          day: moment().format('DD/MM/YYYY'),
-          hour: moment().format('HH:mm'),
+          licensePlate: 
+          '',
+          day: '',
+          hour: '',
           washingType: 'SIMPLE',
         }}
         validationSchema={ScheduleSchema}
